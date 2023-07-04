@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "glicko-from-scratch"
+version = "0.1.0"
+description = ""
+authors = ["Sunil Kumar <sdkumar@hmc.edu>"]
+readme = "README.md"
+packages = [{include = "glicko_from_scratch"}]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+numpy = "^1.25.0"
+scipy = "^1.11.1"
+matplotlib = "^3.7.1"
+tqdm = "^4.65.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

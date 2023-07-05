@@ -19,3 +19,17 @@ After 200 rounds of play, we can clearly see that we learned something! Notice t
 
 IMAGE HERE
 
+After 1000 rounds, noise is significantly reduced and we can see a pretty clear coorelation between the hidden skill and the rating for players, however noise on games is still quite high. 
+
+IMAGE HERE
+
+After 5000 rounds we can see results very clearly!
+
+IMAGE HERE
+
+After 10,000 rounds our results remain stable.
+
+IMAGE
+
+
+

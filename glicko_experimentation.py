@@ -31,7 +31,9 @@ group_b.sort(key=lambda x: -x[1])
 
 # Let's define the likelihood that player a from A wins against player b from B as win_rate(a_skill, b_skill)
 def win_rate(a_skill, b_skill) -> float:
-    probability = 1 / (1 + np.exp(-(15 * (a_skill - 0.5) - 10 * (b_skill - 0.5))))
+    probability = 1 / (
+        1 + np.exp(-(15 * (a_skill**2 - 0.5) - 10 * (b_skill**2 - 0.5)))
+    )
     assert 0 <= probability <= 1
     return probability
 
@@ -90,11 +92,8 @@ def make_figure(iteration):
 
 
 # Let's play this game many times
-play_games = True
 num_rounds = 10000
 for i in tqdm(range(num_rounds)):
-    if not play_games:
-        continue
     # in each round, each player in group A plays a random player in group B
     for a_index in range(len(group_a)):
         b_index = random.randint(0, len(group_b) - 1)
@@ -147,5 +146,13 @@ plt.savefig("figures/estimated_win_probs.png")
 plt.close()
 
 difference = np.abs(true_win_probs - estimated_win_probs)
-plt.imshow(difference, cmap=cmap, interpolation="nearest", norm=norm)
-plt.show()
+average_difference = np.mean(difference)
+plt.imshow(difference, cmap="hot", interpolation="nearest")
+plt.xlabel("Players organized from worst to best")
+plt.ylabel("Games organized from easiest to hardest")
+plt.colorbar()
+plt.title(
+    f"Difference between true and estimated win probability. Average percent difference = {round(average_difference*100, 3)}%"
+)
+plt.savefig("figures/difference.png", bbox_inches="tight")
+plt.close()

@@ -1,14 +1,14 @@
-# glicko_from_scratch
-implements the glicko rating system from scratch and runs a fun experiment
+# glicko_as_ml
+Implements the glicko rating system from scratch and shows how it can be used for modeling. 
 
 # glicko implementation
 See glicko.py for details. 
 
 # Experiment
-I wanted to see if we could use the glicko rating system to learn a relatively sophisticated real world relationship. 
+I wanted to see if we could use the glicko rating system to learn/model a relatively sophisticated real world relationship. 
 
 ## Problem formulation: 
-Suppose we had `n` players and `m` solataire style games. Each player's skill and each game's difficulty is represented by a value between 0 and 1. There exists some model `p_win(player_skill, game_difficulty)` which returns the probability that the player will win the game. We'd like learn this model by observing the outcomes of player-game interactions.
+Suppose we had `n` players and `m` solataire style games. Each player's skill and each game's difficulty is represented by a value between 0 and 1. There exists some model `p_win(player_skill, game_difficulty)` which returns the probability that the player will win the game. We'd like learn this model purely by observing the outcomes of player-game interactions.
 
 ## My solution
 If we initialize each player and game with a glicko rating and then update these ratings based on our observations, we should be able to recover a mapping from rating to underlying skill/difficulty.
@@ -27,18 +27,18 @@ After 2000 rounds we can see results very clearly and the system has pretty much
 
 ![20000 Rounds](figures/2000.png)
 
-After 10,000 rounds our results remain stable and our confidence bounds are really tight.
+After 10,000 rounds our results remain stable and our confidence bounds are really tight (they are artificially bounded below at 30 per Glickman's recommendation).
 
 ![10000 Rounds](figures/10000.png)
 
 ## Evaluating solution
-Here's the ground truth `p_win` function evaluated on each pair of (player, game) in the population. I made up the ground truth `p_win` function pretty arbitrarily (it is a logistic function) you can checkout in glicko_experimentation.py if you are curious.
+Here's the ground truth `p_win` function evaluated on each pair of (player, game) in the population. I made up the ground truth `p_win` function pretty arbitrarily (it is a logistic function) you can check it out in glicko_experimentation.py if you are curious.
 
 ![Ground Truth Results](figures/true_win_probs.png)
 
 As a comparision here's the model we learned from our simulation. Glickman gives us a convinent way to calcuate the expected outcome of a (player, game) pair. We can see that they are pretty similar, but how similar are they?
 ![Learned Results](figures/estimated_win_probs.png)
 
-To help answer this question we can plot the absolute value of the difference between these two matricies, which tells us how different the predicted vs ground truth value is for each (player, game) pair. You can see that most error accumulates along the 50% win probability line - maybe because these observations were inherently more noisy. We find that on average the model's prediction is within 0.96% of the true value, which is awesome! 
+To help answer this question we can plot the absolute value of the difference between these two matricies, which tells us how different the predicted vs ground truth value is for each (player, game) pair. You can see that most error accumulates along the 50% win probability line - maybe because these observations were inherently more noisy. We find that on average the model's prediction is within 0.96% of the true value, which is pretty suprising to me.  
 
 ![Comparing Results](figures/difference.png)

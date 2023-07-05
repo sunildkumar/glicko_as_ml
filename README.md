@@ -17,19 +17,19 @@ I arbitrarily chose to have 100 players and 1000 games. I simulated 10000 "round
 
 After 200 rounds of play, we can clearly see that we learned something! Notice that our model for games is significantly more noisy than our model for players. This makes senses, as we recieve significantly fewer observations per game compared to observations per player.
 
-IMAGE HERE
+![200 Rounds](figures/200.png)
 
 After 1000 rounds, noise is significantly reduced and we can see a pretty clear coorelation between the hidden skill and the rating for players, however noise on games is still quite high. 
 
-IMAGE HERE
+![1000 Rounds](figures/1000.png)
 
 After 5000 rounds we can see results very clearly!
 
-IMAGE HERE
+![5000 Rounds](figures/5000.png)
 
 After 10,000 rounds our results remain stable.
 
-IMAGE
+![10000 Rounds](figures/10000.png)
 
-
+## Evaluating solution
 

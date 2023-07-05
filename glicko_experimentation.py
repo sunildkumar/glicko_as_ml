@@ -6,6 +6,7 @@ from scipy.stats import truncnorm
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 from matplotlib.colors import LinearSegmentedColormap
+import matplotlib
 
 np.random.seed(42)
 random.seed(42)
@@ -30,9 +31,7 @@ group_b.sort(key=lambda x: -x[1])
 
 # Let's define the likelihood that player a from A wins against player b from B as win_rate(a_skill, b_skill)
 def win_rate(a_skill, b_skill) -> float:
-    probability = (
-        1 / (1 + np.exp(-(15 * (a_skill - 0.5) - 10 * (b_skill - 0.5)))) / 2 + 0.5
-    )
+    probability = 1 / (1 + np.exp(-(15 * (a_skill - 0.5) - 10 * (b_skill - 0.5))))
     assert 0 <= probability <= 1
     return probability
 
@@ -102,7 +101,7 @@ for i in tqdm(range(num_rounds)):
         play_game(a_index, b_index)
 
     # save progress every 2% of the way as a figure
-    if i % (0.02 * num_rounds) == 0:
+    if i % (int(0.02 * num_rounds)) == 0:
         make_figure(i)
 
 # save final figure
@@ -120,38 +119,33 @@ for a_index in range(group_a_size):
 
 colors = ["darkred", "red", "orange", "lime", "green"]
 cmap = LinearSegmentedColormap.from_list("mycmap", colors)
-plt.imshow(true_win_probs, cmap=cmap, interpolation="nearest")
+norm = matplotlib.colors.Normalize(vmin=0.0, vmax=1.0)
+
+
+plt.imshow(true_win_probs, cmap=cmap, interpolation="nearest", norm=norm)
 plt.xlabel("Players organized from worst to best")
 plt.ylabel("Games organized from easiest to hardest")
 plt.colorbar()
-plt.title("True probability a player wins against a game")
+plt.title("True probability a player wins game")
 plt.savefig("figures/true_win_probs.png")
 plt.close()
 
-# Now let's calculate the glicko win probability for each player in group A against each player in group B
+# now calculate the glicko win probability for each player in group A against each player in group B
 estimated_win_probs = np.zeros((group_b_size, group_a_size))
 for a_index in range(group_a_size):
     for b_index in range(group_b_size):
         estimated_win_probs[b_index][a_index] = Player.expected_outcome(
-            group_a[a_index][0], group_b[b_index][0]
+            a=group_a[a_index][0], b=group_b[b_index][0]
         )
 
-plt.imshow(estimated_win_probs, cmap=cmap, interpolation="nearest")
+plt.imshow(estimated_win_probs, cmap=cmap, interpolation="nearest", norm=norm)
 plt.xlabel("Players organized from worst to best")
 plt.ylabel("Games organized from easiest to hardest")
 plt.colorbar()
-plt.title("Estimated probability a player wins against a game")
+plt.title("Estimated probability a player wins game")
 plt.savefig("figures/estimated_win_probs.png")
 plt.close()
 
-difference = abs(estimated_win_probs - true_win_probs)
-colors = list(reversed(["darkred", "red", "orange", "lime", "green"]))
-cmap = LinearSegmentedColormap.from_list("mycmap", colors)
-plt.imshow(difference, cmap=cmap, interpolation="nearest")
-plt.xlabel("Players organized from worst to best")
-plt.ylabel("Games organized from easiest to hardest")
-plt.title(
-    f"Difference between estimated and true win probabilities. Average difference = {round(np.mean(difference)*100, 2)}%"
-)
-plt.colorbar()
-plt.savefig("figures/difference.png")
+difference = np.abs(true_win_probs - estimated_win_probs)
+plt.imshow(difference, cmap=cmap, interpolation="nearest", norm=norm)
+plt.show()

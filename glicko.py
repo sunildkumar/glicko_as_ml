@@ -33,7 +33,7 @@ class Player:
         ) * Player.g(other.rd) * (s - self.E(other))
 
     def _get_updated_rd(self, other: "Player", s: float):
-        return math.sqrt(((1 / self.rd**2) + (1 / self.d2(other, s))) ** -1)
+        return max(math.sqrt(((1 / self.rd**2) + (1 / self.d2(other, s))) ** -1), 30)
 
     def update(self, other: "Player", s: float):
         new_r = self._get_updated_r(other, s)

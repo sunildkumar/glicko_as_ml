@@ -23,7 +23,7 @@ group_a = [(Player(), draw_sample()) for _ in range(group_a_size)]
 group_b = [(Player(), draw_sample()) for _ in range(group_b_size)]
 
 
-# Let's define the likelihood that player a from A wins against player b from B as win_rate(a, b)
+# Let's define the likelihood that player a from A wins against player b from B as win_rate(a_skill, b_skill)
 def win_rate(a_skill, b_skill) -> float:
     probability = (
         1 / (1 + np.exp(-(15 * (a_skill - 0.5) - 10 * (b_skill - 0.5)))) / 2 + 0.5
@@ -55,16 +55,32 @@ def make_figure(iteration):
     a_2RD = [2 * element[0].rd for element in group_a]
     b_2RD = [2 * element[0].rd for element in group_b]
 
-    plt.scatter(a_ratings, a_skills, label="group a")
-    plt.scatter(b_ratings, b_skills, label="group b")
+    plt.scatter(
+        a_ratings,
+        a_skills,
+    )
+    plt.scatter(b_ratings, b_skills)
     errorbar_kwargs = dict(
         fmt="o", capsize=5, markersize=6, markeredgewidth=1.5, elinewidth=1.5
     )
-    plt.errorbar(a_ratings, a_skills, xerr=a_2RD, **errorbar_kwargs)
-    plt.errorbar(b_ratings, b_skills, xerr=b_2RD, **errorbar_kwargs)
-    plt.xlabel("rating")
-    plt.ylabel("skill")
+    plt.errorbar(
+        a_ratings,
+        a_skills,
+        xerr=a_2RD,
+        label="Players 95% confidence interval",
+        **errorbar_kwargs,
+    )
+    plt.errorbar(
+        b_ratings,
+        b_skills,
+        xerr=b_2RD,
+        label="Games 95% confidence interval",
+        **errorbar_kwargs,
+    )
+    plt.xlabel("Glicko Rating")
+    plt.ylabel("Hidden skill/difficulty")
     plt.legend()
+    plt.title(f"Rounds: {iteration}")
     plt.savefig(f"figures/{iteration}.png")
     plt.close()
 
@@ -82,4 +98,4 @@ for i in tqdm(range(num_rounds)):
         make_figure(i)
 
 # save final figure
-make_figure("final")
+make_figure(num_rounds)

@@ -13,23 +13,32 @@ Suppose we had `n` players and `m` solataire style games. Each player's skill an
 ## My solution
 If we initialize each player and game with a glicko rating and then update these ratings based on our observations, we should be able to recover a mapping from rating to underlying skill/difficulty.
 
-I arbitrarily chose to have 100 players and 1000 games. I simulated 10000 "rounds" of play, where each round consists of each of the players playing a random game (so we have a total of 100 * 10000 = 1 million observations).
+I arbitrarily chose to have 1000 players and 1000 games. I simulated 10000 "rounds" of play, where each round consists of each of the players playing a random game (so we have a total of 1000 * 10000 = 10 million observations).
 
-After 200 rounds of play, we can clearly see that we learned something! Notice that our model for games is significantly more noisy than our model for players. This makes senses, as we recieve significantly fewer observations per game compared to observations per player.
+After 200 rounds of play, we can clearly see that we learned something! There is a reasonably clear correlation between rating and the hidden skill/difficulty. 
 
 ![200 Rounds](figures/200.png)
 
-After 1000 rounds, noise is significantly reduced and we can see a pretty clear coorelation between the hidden skill and the rating for players, however noise on games is still quite high. 
+After 1000 rounds, noise is significantly reduced. 
 
 ![1000 Rounds](figures/1000.png)
 
-After 5000 rounds we can see results very clearly!
+After 2000 rounds we can see results very clearly and the system has pretty much stabilized. 
 
-![5000 Rounds](figures/5000.png)
+![20000 Rounds](figures/2000.png)
 
-After 10,000 rounds our results remain stable.
+After 10,000 rounds our results remain stable and our confidence bounds are really tight.
 
 ![10000 Rounds](figures/10000.png)
 
 ## Evaluating solution
+Here's the ground truth `p_win` function evaluated on each pair of (player, game) in the population. I made up the ground truth `p_win` function pretty arbitrarily (it is a logistic function) you can checkout in glicko_experimentation.py if you are curious.
 
+![Ground Truth Results](figures/true_win_probs.png)
+
+As a comparision here's the model we learned from our simulation. Glickman gives us a convinent way to calcuate the expected outcome of a (player, game) pair. We can see that they are pretty similar, but how similar are they?
+![Learned Results](figures/estimated_win_probs.png)
+
+To help answer this question we can plot the absolute value of the difference between these two matricies, which tells us how different the predicted vs ground truth value is for each (player, game) pair. You can see that most error accumulates along the 50% win probability line - maybe because these observations were inherently more noisy. We find that on average the model's prediction is within 0.96% of the true value, which is awesome! 
+
+![Comparing Results](figures/difference.png)

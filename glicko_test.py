@@ -26,6 +26,12 @@ class TestGlicko(unittest.TestCase):
         self.assertAlmostEqual(p.rating, 1464, places=0)
         self.assertAlmostEqual(p.rd, 151, places=0)
 
+    def test_expected_outcome(self):
+        player1 = Player(rating=1400, rd=80)
+        player2 = Player(rating=1500, rd=150)
+        expected_outcome = Player.expected_outcome(player1, player2)
+        self.assertAlmostEqual(expected_outcome, 0.376, places=3)
+
 
 if __name__ == "__main__":
     unittest.main()

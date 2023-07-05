@@ -41,3 +41,10 @@ class Player:
 
         self.rating = new_r
         self.rd = new_rd
+
+    @staticmethod
+    def expected_outcome(a: "Player", b: "Player"):
+        # black decided to format this in a way that makes it hard to read so I'm turning off formatting
+        # fmt: off
+        return 1 / (1+ (10** (-Player.g(math.sqrt(a.rd**2 + b.rd**2))* (a.rating - b.rating)/400)))
+        # fmt: on

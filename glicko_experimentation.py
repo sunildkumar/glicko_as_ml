@@ -5,6 +5,7 @@ import numpy as np
 from scipy.stats import truncnorm
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+from matplotlib.colors import LinearSegmentedColormap
 
 np.random.seed(42)
 random.seed(42)
@@ -17,10 +18,14 @@ def draw_sample(mean=0.5, sd=1, low=0, upp=1):
 
 # I'm particularly interested in glicko on games where there are two distinct groups where they only play against each other but not internally. Call these groups A, B.
 # All players will have identical glicko ratings to start, however the underlying skill of players will be represented explicitly as a number between 0 and 1 drawn from the gaussian.
-group_a_size = 100
-group_b_size = 1000
+group_a_size = 1000  # players
+group_b_size = 1000  # games
 group_a = [(Player(), draw_sample()) for _ in range(group_a_size)]
 group_b = [(Player(), draw_sample()) for _ in range(group_b_size)]
+
+# sort the groups by skill
+group_a.sort(key=lambda x: x[1])
+group_b.sort(key=lambda x: -x[1])
 
 
 # Let's define the likelihood that player a from A wins against player b from B as win_rate(a_skill, b_skill)
@@ -86,8 +91,11 @@ def make_figure(iteration):
 
 
 # Let's play this game many times
+play_games = True
 num_rounds = 10000
 for i in tqdm(range(num_rounds)):
+    if not play_games:
+        continue
     # in each round, each player in group A plays a random player in group B
     for a_index in range(len(group_a)):
         b_index = random.randint(0, len(group_b) - 1)
@@ -99,3 +107,51 @@ for i in tqdm(range(num_rounds)):
 
 # save final figure
 make_figure(num_rounds)
+
+# Evaluate the results
+# first calculate the true win probability for each player in group A against each player in group B
+true_win_probs = np.zeros((group_b_size, group_a_size))
+
+for a_index in range(group_a_size):
+    for b_index in range(group_b_size):
+        true_win_probs[b_index][a_index] = win_rate(
+            group_a[a_index][1], group_b[b_index][1]
+        )
+
+colors = ["darkred", "red", "orange", "lime", "green"]
+cmap = LinearSegmentedColormap.from_list("mycmap", colors)
+plt.imshow(true_win_probs, cmap=cmap, interpolation="nearest")
+plt.xlabel("Players organized from worst to best")
+plt.ylabel("Games organized from easiest to hardest")
+plt.colorbar()
+plt.title("True probability a player wins against a game")
+plt.savefig("figures/true_win_probs.png")
+plt.close()
+
+# Now let's calculate the glicko win probability for each player in group A against each player in group B
+estimated_win_probs = np.zeros((group_b_size, group_a_size))
+for a_index in range(group_a_size):
+    for b_index in range(group_b_size):
+        estimated_win_probs[b_index][a_index] = Player.expected_outcome(
+            group_a[a_index][0], group_b[b_index][0]
+        )
+
+plt.imshow(estimated_win_probs, cmap=cmap, interpolation="nearest")
+plt.xlabel("Players organized from worst to best")
+plt.ylabel("Games organized from easiest to hardest")
+plt.colorbar()
+plt.title("Estimated probability a player wins against a game")
+plt.savefig("figures/estimated_win_probs.png")
+plt.close()
+
+difference = abs(estimated_win_probs - true_win_probs)
+colors = list(reversed(["darkred", "red", "orange", "lime", "green"]))
+cmap = LinearSegmentedColormap.from_list("mycmap", colors)
+plt.imshow(difference, cmap=cmap, interpolation="nearest")
+plt.xlabel("Players organized from worst to best")
+plt.ylabel("Games organized from easiest to hardest")
+plt.title(
+    f"Difference between estimated and true win probabilities. Average difference = {round(np.mean(difference)*100, 2)}%"
+)
+plt.colorbar()
+plt.savefig("figures/difference.png")

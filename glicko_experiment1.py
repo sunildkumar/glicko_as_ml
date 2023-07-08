@@ -38,7 +38,7 @@ def win_rate(a_skill, b_skill) -> float:
     return probability
 
 
-def find_winner(a_skill: int, b_skill: int) -> Tuple[float, float]:
+def find_winner(a_skill: int, b_skill: int) -> Tuple[int, int]:
     # Then given the skill of players a, b we can determine the win state for players a, b
     a_wins = int(win_rate(a_skill, b_skill) > random.random())
     b_wins = 1 - a_wins

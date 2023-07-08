@@ -32,7 +32,7 @@ After 10,000 rounds our results remain stable and our confidence bounds are real
 ![10000 Rounds](figures/10000.png)
 
 ## Evaluating solution
-Here's the ground truth `p_win` function evaluated on each pair of (player, game) in the population. I made up the ground truth `p_win` function pretty arbitrarily (it is a logistic function) you can check it out in glicko_experimentation.py if you are curious.
+Here's the ground truth `p_win` function evaluated on each pair of (player, game) in the population. I made up the ground truth `p_win` function pretty arbitrarily (it is a logistic function) you can check it out in glicko_experiment1.py if you are curious.
 
 ![Ground Truth Results](figures/true_win_probs.png)
 
